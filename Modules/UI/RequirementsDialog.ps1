@@ -139,6 +139,86 @@ Wenn vCenter-Credentials angegeben werden, werden folgende zusätzliche Daten er
                     </StackPanel>
                 </Border>
 
+                <!-- UAG optional -->
+                <TextBlock Text="🛡  Optional: UAG-Zugangsdaten" Style="{StaticResource SubHeadingStyle}"/>
+                <Border Background="#1E2A3A" CornerRadius="5" Padding="12,8" Margin="0,0,0,6">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource BodyStyle}" Foreground="#A6ADC8">
+Wenn UAG-Credentials (Admin-Konto) angegeben werden, verbindet sich das Tool per REST API (Port 9443) mit jedem konfigurierten Unified Access Gateway und erfasst:
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  General Configuration</Run>
+                            <Run Foreground="#A6ADC8"> — Allgemeine UAG-Konfiguration (Name, Version, FIPS-Modus, CEIP, Quiesce-Status)</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Edge Services</Run>
+                            <Run Foreground="#A6ADC8"> — Konfigurierte Edge-Dienste (Horizon, Web Reverse Proxy, Tunnel, etc.)</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Admin Users</Run>
+                            <Run Foreground="#A6ADC8"> — Konfigurierte Administrator-Konten auf dem UAG</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  SSL-Zertifikate</Run>
+                            <Run Foreground="#A6ADC8"> — Zertifikatsdetails für End-User- und Admin-Interface</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Auth Methods</Run>
+                            <Run Foreground="#A6ADC8"> — Konfigurierte Authentifizierungsmethoden (RADIUS, RSA SecurID, SAML, etc.)</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- App Volumes optional -->
+                <TextBlock Text="📦  Optional: App Volumes-Zugangsdaten" Style="{StaticResource SubHeadingStyle}"/>
+                <Border Background="#1E2A3A" CornerRadius="5" Padding="12,8" Margin="0,0,0,6">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource BodyStyle}" Foreground="#A6ADC8">
+Wenn App Volumes-Credentials angegeben werden, verbindet sich das Tool per REST API mit jedem in Horizon konfigurierten App Volumes Manager und erfasst:
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  App Products &amp; Packages</Run>
+                            <Run Foreground="#A6ADC8"> — Alle Applikations-Produkte mit Paketen (Version, Status, Größe, OS)</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Assignments</Run>
+                            <Run Foreground="#A6ADC8"> — Zuweisungen von App Products an AD-Gruppen/Benutzer/OUs</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Writables</Run>
+                            <Run Foreground="#A6ADC8"> — Writable Volumes mit Besitzer, Status und Speicherort</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Lizenz &amp; Usage</Run>
+                            <Run Foreground="#A6ADC8"> — Lizenzinformationen und aktuelle Nutzungsstatistik</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  LDAP-Domänen</Run>
+                            <Run Foreground="#A6ADC8"> — Konfigurierte Active Directory Verbindungen im App Volumes Manager</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Admin Roles &amp; Zuweisungen</Run>
+                            <Run Foreground="#A6ADC8"> — Rollen-Definitionen mit Berechtigungen und Gruppen-Zuordnungen</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Storage (Datastores, Storages, Storage Groups)</Run>
+                            <Run Foreground="#A6ADC8"> — Speicherkonfiguration mit Kapazität, Pfaden und Replikation</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Machine Managers</Run>
+                            <Run Foreground="#A6ADC8"> — vSphere/Horizon-Integrationen mit Status und Verbindungsdetails</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Manager Services</Run>
+                            <Run Foreground="#A6ADC8"> — App Volumes Manager-Instanzen mit Version und Registrierungsstatus</Run>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}">
+                            <Run Foreground="#89B4FA">•  Settings</Run>
+                            <Run Foreground="#A6ADC8"> — Alle Konfigurationseinstellungen des App Volumes Managers</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
                 <!-- PSRemoting optional -->
                 <TextBlock Text="🔧  Optional: PSRemoting auf Connection Servern" Style="{StaticResource SubHeadingStyle}"/>
                 <Border Background="#2A1E2A" CornerRadius="5" Padding="12,8" Margin="0,0,0,6">
@@ -291,6 +371,31 @@ Der generierte HTML-Report enthält folgende Abschnitte:
                         <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Cloud Pod Architecture (CPA)</Run><Run Foreground="#A6ADC8"> — Pods, Sites und Inter-Pod-Verbindungen</Run></TextBlock>
                         <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Lizenz</Run><Run Foreground="#A6ADC8"> — Lizenzstatus, Ablaufdatum und Health-Indikator</Run></TextBlock>
                         <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">App Volumes Manager</Run><Run Foreground="#A6ADC8"> — Verbundene App Volumes Manager mit Status und Version</Run></TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#252535" CornerRadius="5" Padding="12,8" Margin="0,0,0,5">
+                    <StackPanel>
+                        <TextBlock Text="🛡  UAG Details (optional)" Style="{StaticResource SubHeadingStyle}" Margin="0,0,0,4"/>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">General Configuration</Run><Run Foreground="#A6ADC8"> — UAG-Version, FIPS, CEIP, Quiesce-Modus je Gateway</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Edge Services</Run><Run Foreground="#A6ADC8"> — Horizon, Tunnel, Web Reverse Proxy und weitere Edge-Dienste</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Admin Users</Run><Run Foreground="#A6ADC8"> — Konfigurierte UAG-Administratoren</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">SSL-Zertifikate</Run><Run Foreground="#A6ADC8"> — End-User- und Admin-Zertifikatsdetails mit Ablaufdaten</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Auth Methods</Run><Run Foreground="#A6ADC8"> — Authentifizierungsmethoden (RADIUS, SAML, Certificate, etc.)</Run></TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#252535" CornerRadius="5" Padding="12,8" Margin="0,0,0,5">
+                    <StackPanel>
+                        <TextBlock Text="📦  App Volumes Details (optional)" Style="{StaticResource SubHeadingStyle}" Margin="0,0,0,4"/>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">App Products &amp; Packages</Run><Run Foreground="#A6ADC8"> — Applikationen mit Paketen, Versionen, Zuweisungen und Status</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Writables</Run><Run Foreground="#A6ADC8"> — Writable Volumes mit Besitzer, Datastore und Größe</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Lizenz &amp; Usage</Run><Run Foreground="#A6ADC8"> — Lizenzinformationen und Nutzungsstatistik</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">LDAP-Domänen</Run><Run Foreground="#A6ADC8"> — AD-Verbindungen des App Volumes Managers</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Admin Roles</Run><Run Foreground="#A6ADC8"> — Rollen, Berechtigungen und Gruppen-Zuordnungen</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Storage</Run><Run Foreground="#A6ADC8"> — Datastores, Storages, Storage Groups mit Kapazitäten und Replikation</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Machine Managers</Run><Run Foreground="#A6ADC8"> — vSphere-Integrationen mit Verbindungsstatus</Run></TextBlock>
+                        <TextBlock Style="{StaticResource BodyStyle}"><Run Foreground="#89B4FA">Manager Services &amp; Settings</Run><Run Foreground="#A6ADC8"> — Server-Instanzen und Konfigurationseinstellungen</Run></TextBlock>
                     </StackPanel>
                 </Border>
 

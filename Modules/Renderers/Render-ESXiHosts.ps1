@@ -150,14 +150,13 @@ function New-HtmlESXiHostsSection {
             (Invoke-HtmlEncode $buildDisplay),
             (Invoke-HtmlEncode "$($h.NumCpuCores)"),
             (Invoke-HtmlEncode "$($h.MemoryGB)"),
-            (Invoke-HtmlEncode "$($h.NumMachines)"),
             (Invoke-HtmlEncode $poweredOnCount),
             $vcpuRatioHtml,
             $vgpuHtml,
             $vgpuDriverHtml
         )
     }
-    $table = New-HtmlTable -Headers @("Name","Cluster","Version","Build","CPUs (physical)","RAM GB","VMs (Horizon)","Powered-On VMs","vCPU:pCPU","vGPU Types","vGPU Driver") -Rows $rows
+    $table = New-HtmlTable -Headers @("Name","Cluster","Version","Build","CPUs (physical)","RAM GB","Powered-On VMs","vCPU:pCPU","vGPU Types","vGPU Driver") -Rows $rows
     $clusters = $ESXiHosts | Select-Object -ExpandProperty ClusterName -Unique
     $clusterSummary = ""
     foreach ($clusterName in $clusters) {

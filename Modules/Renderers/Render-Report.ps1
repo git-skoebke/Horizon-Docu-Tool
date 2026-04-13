@@ -112,14 +112,34 @@ details[open] > summary::before {
     transform: rotate(90deg);
 }
 
-/* === Desktop Pool Detail Cards === */
-details.pool-detail { /* closed by default in browser */ }
-details.pool-detail > summary {
-    padding: 10px 14px; font-weight: 600; cursor: pointer;
-    background: #f7f9fc; border-radius: 4px;
-    display: flex; align-items: center; gap: 6px;
+/* === Unified Detail Cards === */
+details.detail-card {
+    margin-bottom: 8px; border: 1px solid #d1d9e6;
+    border-radius: 6px; overflow: hidden;
 }
-details.pool-detail[open] > summary { border-bottom: 1px solid #d1d9e6; border-radius: 4px 4px 0 0; }
+details.detail-card > summary {
+    padding: 12px 16px; font-weight: 600; cursor: pointer;
+    background: #f7f9fc;
+    display: flex; align-items: center; gap: 8px;
+}
+details.detail-card[open] > summary {
+    border-bottom: 1px solid #d1d9e6;
+}
+details.detail-card .card-meta {
+    font-weight: 400; font-size: 0.88em; color: #718096;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+details.detail-card > div { padding: 16px 20px; }
+
+/* === Section Sub-Headers (inside cards and sections) === */
+section h4 {
+    margin: 16px 0 8px; font-size: 13px;
+    color: #2c5282; font-weight: 600;
+}
+section > h4:first-of-type,
+details.detail-card > div > h4:first-child {
+    margin-top: 0;
+}
 
 /* === Inline collapsible (table cells: member lists, disks, etc.) === */
 details.inline-detail > summary {

@@ -46,6 +46,8 @@ function Get-HtmlColWidths {
             'Name|Address'            = @('45%','55%')
             'Username|Role'           = @('55%','45%')
             'Auth Method|Status'      = @('65%','35%')
+            'Role|VM Name'            = @('35%','65%')
+            'Member'                  = @('100%')
         }
         $key = $Headers -join '|'
         if ($known2.ContainsKey($key)) {
@@ -79,20 +81,31 @@ function Get-HtmlColWidths {
         'Members'         = 70
         'Member Count'    = 100
         'NetBIOS'         = 80
-        'Version'         = 115
-        'Build'           = 115
-        'Agent'           = 115
+        'Version'         = 75
+        'Build'           = 90
+        'Agent'           = 100
         'Log Level'       = 80
         'Pending %'       = 80
+        'Message'         = 120
         'Spare'           = 60
         'Min'             = 55
         'Max'             = 55
         'Current'         = 70
-        'vCPU:pCPU'       = 82
+        'CPUs (physical)' = 100
+        'RAM GB'          = 70
+        'Powered-On VMs'  = 100
+        'vCPU:pCPU'       = 75
+        'vGPU Types'      = 90
+        'vGPU Driver'     = 90
         'Delivery'        = 100
         'Packages'        = 80
         'AppStacks'       = 82
         'Writables'       = 80
+        'Override'        = 80
+        'Site'            = 130
+        'Home Site'       = 130
+        'User / Group'    = 200
+        'Connection Server' = 200
         # Timestamps — always the same width
         'Last Changed'    = 155
         'Assigned At'     = 155
@@ -104,6 +117,7 @@ function Get-HtmlColWidths {
         'Cert Valid'      = 80
         'First Seen'      = 145
         'Last Seen'       = 145
+        'Last Updated'    = 145
     }
 
     # Assign fixed px to known columns; mark others as flexible.
@@ -123,9 +137,10 @@ function Get-HtmlColWidths {
     }
 
     # Distribute remaining width equally among flexible columns.
-    # Assume the table container is ~900px (reasonable for the report layout);
-    # flexible columns get equal shares of whatever is left after px columns.
-    $nominalPx  = 900
+    # Assume the table container is ~1100px (report content area is flex:1
+    # with 32px side padding — on a typical 1400-1600px viewport this gives
+    # ~1100-1300px usable width after the 220px TOC sidebar).
+    $nominalPx  = 1100
     $remainPx   = [math]::Max(0, $nominalPx - $totalPx)
     $flexPx     = if ($flexIdx.Count -gt 0) { [math]::Round($remainPx / $flexIdx.Count) } else { 0 }
 

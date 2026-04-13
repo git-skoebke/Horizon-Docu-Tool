@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # Render-DesktopPools — New-HtmlDesktopPoolsSection
 # Dot-sourced inside the Runspace scriptblock
 # =============================================================================
@@ -11,40 +11,25 @@ function New-HtmlDesktopPoolsSection {
 
     $content = [System.Text.StringBuilder]::new()
 
-    # Overview table
-    $ovRows = foreach ($p in ($Pools | Sort-Object Name)) {
-        $statusBadge = if ($p.Enabled -eq "True") { New-HtmlBadge -Text "Enabled" -Color "ok" } else { New-HtmlBadge -Text "Disabled" -Color "neutral" }
-        $typeBadge   = New-HtmlBadge -Text "$($p.Type)" -Color "neutral"
-        $srcBadge    = New-HtmlBadge -Text "$($p.Source)" -Color "neutral"
-        New-HtmlTableRow -Cells @(
-            (Invoke-HtmlEncode $p.Name),
-            (Invoke-HtmlEncode $p.DisplayName),
-            $typeBadge, $srcBadge, $statusBadge,
-            (Invoke-HtmlEncode $p.UserAssignment),
-            (Invoke-HtmlEncode $p.NumMachines),
-            (Invoke-HtmlEncode $p.MinVMs),
-            (Invoke-HtmlEncode $p.MaxVMs),
-            (Invoke-HtmlEncode $p.SpareVMs),
-            (Invoke-HtmlEncode $p.GoldenImage),
-            (Invoke-HtmlEncode $p.Snapshot)
-        )
-    }
-    $null = $content.Append((New-HtmlTable -Headers @("Name","Display Name","Type","Source","Status","User Assignment","Current","Min","Max","Spare","Golden Image","Snapshot") -Rows $ovRows))
-
-    # Per-pool detail cards
     foreach ($p in ($Pools | Sort-Object Name)) {
         $statusBadge = if ($p.Enabled -eq "True") { New-HtmlBadge -Text "Enabled" -Color "ok" } else { New-HtmlBadge -Text "Disabled" -Color "neutral" }
         $typeBadge   = New-HtmlBadge -Text "$($p.Type)" -Color "neutral"
         $srcBadge    = New-HtmlBadge -Text "$($p.Source)" -Color "neutral"
 
-        $null = $content.Append("<details class='pool-detail' style='margin-top:16px;border:1px solid #d1d9e6;border-radius:4px;'>")
-        $null = $content.Append("<summary style='padding:10px 14px;font-weight:600;cursor:pointer;background:#f7f9fc;border-radius:4px;'>")
-        $null = $content.Append("$(Invoke-HtmlEncode $p.Name) $typeBadge $srcBadge")
+        $displayInfo = if ($p.DisplayName -and $p.DisplayName -ne $p.Name) {
+            " <span class='card-meta'>($(Invoke-HtmlEncode $p.DisplayName))</span>"
+        } else { "" }
+
+        $null = $content.Append("<details class='detail-card'>")
+        $null = $content.Append("<summary>")
+        $null = $content.Append((Invoke-HtmlEncode $p.Name))
+        $null = $content.Append($displayInfo)
+        $null = $content.Append(" <span class='card-meta'>$typeBadge &nbsp;$srcBadge &nbsp;$statusBadge</span>")
         $null = $content.Append("</summary>")
-        $null = $content.Append("<div style='padding:14px 18px;'>")
+        $null = $content.Append("<div>")
 
         # General
-        $null = $content.Append("<h4 style='margin:0 0 8px;font-size:13px;color:#2c5282;'>General</h4>")
+        $null = $content.Append("<h4>General</h4>")
         $genRows = @(
             (New-HtmlTableRow -Cells @("Status",          $statusBadge)),
             (New-HtmlTableRow -Cells @("User Assignment",  (Invoke-HtmlEncode $p.UserAssignment))),
@@ -76,11 +61,20 @@ function New-HtmlDesktopPoolsSection {
         if ($p.UpdatedAt)                { $genRows += New-HtmlTableRow -Cells @("Last Updated",          (Invoke-HtmlEncode $p.UpdatedAt)) }
         $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $genRows))
 
+        # VM Sizing
+        $null = $content.Append("<h4>VM Sizing</h4>")
+        $sizeRows = @(
+            (New-HtmlTableRow -Cells @("Current VMs", (Invoke-HtmlEncode $p.NumMachines))),
+            (New-HtmlTableRow -Cells @("Min VMs",     (Invoke-HtmlEncode $p.MinVMs))),
+            (New-HtmlTableRow -Cells @("Max VMs",     (Invoke-HtmlEncode $p.MaxVMs))),
+            (New-HtmlTableRow -Cells @("Spare VMs",   (Invoke-HtmlEncode $p.SpareVMs)))
+        )
+        $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $sizeRows))
+
         # Provisioning (only for non-MANUAL, non-RDS)
-        $isRds    = ($p.Type -eq "RDS")
-        $isManual = ($p.Source -eq "VIRTUAL_CENTER" -and $p.UserAssignment -eq "DEDICATED" -and -not $p.NamingPattern)
+        $isRds = ($p.Type -eq "RDS")
         if (-not $isRds -and $p.GoldenImage) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Provisioning</h4>")
+            $null = $content.Append("<h4>Provisioning</h4>")
             $provRows = @(
                 (New-HtmlTableRow -Cells @("Golden Image",  (Invoke-HtmlEncode $p.GoldenImage))),
                 (New-HtmlTableRow -Cells @("GI Path",       (Invoke-HtmlEncode $p.GoldenImagePath))),
@@ -93,13 +87,13 @@ function New-HtmlDesktopPoolsSection {
                 $cpuStr = (Invoke-HtmlEncode $p.NumCpus) + " cores, " + (Invoke-HtmlEncode $p.NumCoresPerSocket) + " per socket"
                 $provRows += New-HtmlTableRow -Cells @("CPUs", $cpuStr)
             }
-            if ($p.RamMB)          { $provRows += New-HtmlTableRow -Cells @("RAM",             "$(Invoke-HtmlEncode $p.RamMB) MB") }
+            if ($p.RamMB) { $provRows += New-HtmlTableRow -Cells @("RAM", "$(Invoke-HtmlEncode $p.RamMB) MB") }
             $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $provRows))
         }
 
         # IC Internal VMs (Instant Clone only)
         if ($p.Source -eq "INSTANT_CLONE") {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Instant Clone Chain</h4>")
+            $null = $content.Append("<h4>Instant Clone Chain</h4>")
             if ($p.CpTemplate -or $p.CpReplica) {
                 $tplDisplay = if ($p.CpTemplate) { $p.CpTemplate } else { "-" }
                 $repDisplay = if ($p.CpReplica)  { $p.CpReplica  } else { "-" }
@@ -117,29 +111,29 @@ function New-HtmlDesktopPoolsSection {
 
         # RDS Farm
         if ($isRds -and $p.FarmName) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>RDS Farm</h4>")
+            $null = $content.Append("<h4>RDS Farm</h4>")
             $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows @(
                 (New-HtmlTableRow -Cells @("Farm", (Invoke-HtmlEncode $p.FarmName)))
             )))
         }
 
         # Entitlements
-        $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Entitlements</h4>")
+        $null = $content.Append("<h4>Entitlements</h4>")
         if ($p.Entitlements -and $p.Entitlements.Count -gt 0) {
             $null = $content.Append("<p>$(($p.Entitlements | ForEach-Object { Invoke-HtmlEncode $_ }) -join ", ")</p>")
         } else {
             $null = $content.Append("<p><em style='color:#888'>None configured</em></p>")
         }
 
-        # Global Entitlement — name already returned by API in global_entitlement_name
+        # Global Entitlement
         if ($p.GlobalEntitlementName -and $p.GlobalEntitlementName -ne "") {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Global Entitlement</h4>")
+            $null = $content.Append("<h4>Global Entitlement</h4>")
             $null = $content.Append("<p>$(Invoke-HtmlEncode $p.GlobalEntitlementName)</p>")
         }
 
         # vCenter
         if ($p.VcenterName -and $p.VcenterName -ne "") {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>vCenter</h4>")
+            $null = $content.Append("<h4>vCenter</h4>")
             $null = $content.Append("<p>$(Invoke-HtmlEncode $p.VcenterName)</p>")
         }
 
@@ -148,4 +142,3 @@ function New-HtmlDesktopPoolsSection {
 
     return New-HtmlSection -Id "desktop-pools" -Title "Desktop Pools" -Content $content.ToString()
 }
-

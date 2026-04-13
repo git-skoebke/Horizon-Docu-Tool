@@ -402,13 +402,20 @@
                     Margin="0,8,0,0"
                     MinWidth="120"/>
 
-            <!-- PDF Export option -->
-            <CheckBox x:Name="ChkExportPdf"
-                      Content="Export as PDF"
-                      IsChecked="False"
-                      Foreground="#A6ADC8"
-                      FontSize="12"
-                      Margin="0,8,0,0"/>
+            <!-- Report options -->
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <CheckBox x:Name="ChkExportPdf"
+                          Content="Export as PDF"
+                          IsChecked="False"
+                          Foreground="#A6ADC8"
+                          FontSize="12"/>
+                <CheckBox x:Name="ChkOpenHtml"
+                          Content="Open HTML Report"
+                          IsChecked="True"
+                          Foreground="#A6ADC8"
+                          FontSize="12"
+                          Margin="18,0,0,0"/>
+            </StackPanel>
 
             <!-- ============================================================ -->
             <!-- GROUP 6 — GENERATE REPORT BUTTON                             -->

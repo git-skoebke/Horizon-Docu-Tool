@@ -96,14 +96,14 @@ function New-HtmlUagDataSection {
         $gwTitle = Invoke-HtmlEncode "$($uag.GatewayName) ($($uag.GatewayIP))"
 
         if ($uag.LoginFailed) {
-            $null = $sb.Append("<details class='pool-detail' open><summary>$gwTitle</summary>")
+            $null = $sb.Append("<details class='detail-card' open><summary>$gwTitle</summary>")
             $null = $sb.Append("<p style='padding:10px;color:#c53030;'>")
             $null = $sb.Append("UAG API login failed for $(Invoke-HtmlEncode $uag.GatewayIP) — check credentials and port 9443 reachability.")
             $null = $sb.Append("</p></details>")
             continue
         }
 
-        $null = $sb.Append("<details class='pool-detail'><summary>$gwTitle</summary>")
+        $null = $sb.Append("<details class='detail-card'><summary>$gwTitle</summary>")
         $null = $sb.Append("<div style='padding:12px 0;'>")
 
         # ── General ──────────────────────────────────────────────────────────

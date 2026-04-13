@@ -177,7 +177,7 @@ function Get-HznAppVolumesData {
                 StorageDefaults   = $null
                 StorageDatastores = @()
                 Storages          = @()
-                FileShares        = @()
+                StorageGroups     = @()
                 MachineManagers   = @()
                 ManagerServices   = @()
                 Settings          = @()
@@ -504,18 +504,42 @@ function Get-HznAppVolumesData {
             Write-RunspaceLog "AppVolumes [$server]: storages: $(@($storages).Count)" "INFO"
         }
 
-        $fileShares = @()
-        $raw = Invoke-AvCvGet -Server $server -Session $session -Path "file_shares"
-        if ($raw -and $raw.file_shares) {
-            $fileShares = foreach ($f in $raw.file_shares) {
+        $storageGroups = @()
+        $raw = Invoke-AvCvGet -Server $server -Session $session -Path "storage_groups"
+        if ($raw -and $raw.storage_groups) {
+            $storageGroups = foreach ($sg in $raw.storage_groups) {
+                # Fetch detail (includes embedded storages/members) per group
+                $members = @()
+                $detail = Invoke-AvCvGet -Server $server -Session $session -Path "storage_groups/$($sg.id)"
+                if ($detail -and $detail.storage_group -and $detail.storage_group.storages) {
+                    $members = foreach ($m in $detail.storage_group.storages) {
+                        [PSCustomObject]@{
+                            Id         = $m.id
+                            Name       = $m.name
+                            Datacenter = $m.datacenter
+                            SpaceUsed  = $m.space_used
+                            SpaceTotal = $m.space_total
+                            Deleted    = $m.deleted
+                        }
+                    }
+                }
                 [PSCustomObject]@{
-                    Name     = $f.name
-                    Computer = $f.computer
-                    Unc      = $f.unc
-                    Added    = (Format-AvTimestamp $f.added)
+                    Id              = $sg.id
+                    Name            = $sg.name
+                    Strategy        = $sg.strategy
+                    TemplateStorage = (& $cleanUniq $sg.template_storage)
+                    MemberCount     = $sg.members
+                    SpaceUsed       = $sg.space_used
+                    SpaceTotal      = $sg.space_total
+                    AutoImport      = $sg.auto_import
+                    AutoReplicate   = $sg.auto_replicate
+                    ReplicatedAt    = (Format-AvTimestamp $sg.replicated_at)
+                    ImportedAt      = (Format-AvTimestamp $sg.imported_at)
+                    Created         = (Format-AvTimestamp $sg.created_at)
+                    Members         = @($members)
                 }
             }
-            Write-RunspaceLog "AppVolumes [$server]: file_shares: $(@($fileShares).Count)" "INFO"
+            Write-RunspaceLog "AppVolumes [$server]: storage_groups: $(@($storageGroups).Count)" "INFO"
         }
 
         # ── Machine Managers (vSphere/Horizon integrations) ─────────────────
@@ -622,7 +646,7 @@ function Get-HznAppVolumesData {
             StorageDefaults   = $storageDefaults
             StorageDatastores = @($storageDatastores)
             Storages          = @($storages)
-            FileShares        = @($fileShares)
+            StorageGroups     = @($storageGroups)
             MachineManagers   = @($machineManagers)
             ManagerServices   = @($managerServices)
             Settings          = @($settings)

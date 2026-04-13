@@ -63,6 +63,11 @@ function Get-HznConnectionServers {
             $diskTotalGB   = $null
             $lastPatchId   = ""
             $lastPatchDate = ""
+            $netIPAddress  = ""
+            $netSubnet     = ""
+            $netGateway    = ""
+            $netDNS1       = ""
+            $netDNS2       = ""
 
             # locked.properties via PSRemoting (reads file locally on target server)
             try {
@@ -79,6 +84,40 @@ function Get-HznConnectionServers {
 
             # Build credential for remote WMI/ADSI queries (reuse Horizon admin cred)
             $remoteSkipped = @()
+
+            # Network configuration via PSRemoting
+            try {
+                $netInfo = Invoke-Command -ComputerName $csHost -Credential $cred -ErrorAction Stop -ScriptBlock {
+                    # Get the adapter that has a default gateway (active NIC)
+                    $adapter = Get-NetIPConfiguration | Where-Object { $_.IPv4DefaultGateway } | Select-Object -First 1
+                    if ($adapter) {
+                        $ifIndex  = $adapter.InterfaceIndex
+                        $ipAddr   = ($adapter.IPv4Address | Select-Object -First 1).IPAddress
+                        $gateway  = ($adapter.IPv4DefaultGateway | Select-Object -First 1).NextHop
+                        $prefix   = (Get-NetIPAddress -InterfaceIndex $ifIndex -AddressFamily IPv4 | Select-Object -First 1).PrefixLength
+                        $dns      = (Get-DnsClientServerAddress -InterfaceIndex $ifIndex -AddressFamily IPv4).ServerAddresses
+                        # Convert prefix length to subnet mask
+                        $maskBin  = ('1' * $prefix).PadRight(32, '0')
+                        $mask     = (0..3 | ForEach-Object { [convert]::ToInt32($maskBin.Substring($_ * 8, 8), 2) }) -join '.'
+                        [PSCustomObject]@{
+                            IP      = $ipAddr
+                            Subnet  = $mask
+                            Gateway = $gateway
+                            DNS1    = if ($dns.Count -ge 1) { $dns[0] } else { "" }
+                            DNS2    = if ($dns.Count -ge 2) { $dns[1] } else { "" }
+                        }
+                    }
+                }
+                if ($netInfo) {
+                    $netIPAddress = $netInfo.IP
+                    $netSubnet    = $netInfo.Subnet
+                    $netGateway   = $netInfo.Gateway
+                    $netDNS1      = $netInfo.DNS1
+                    $netDNS2      = $netInfo.DNS2
+                }
+            } catch {
+                $remoteSkipped += "network config"
+            }
 
             # Local Administrators group via PSRemoting (runs locally on target server)
             try {
@@ -180,6 +219,11 @@ function Get-HznConnectionServers {
                 DiskTotalGB         = $diskTotalGB
                 LastPatchId         = $lastPatchId
                 LastPatchDate       = $lastPatchDate
+                NetIPAddress        = $netIPAddress
+                NetSubnet           = $netSubnet
+                NetGateway          = $netGateway
+                NetDNS1             = $netDNS1
+                NetDNS2             = $netDNS2
             }
         }
     } catch {

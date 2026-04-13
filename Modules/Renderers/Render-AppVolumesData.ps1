@@ -78,17 +78,18 @@ function New-HtmlAppVolumesDataSection {
 .av-tbl tbody tr:nth-child(4n+2) td { background: #f0f4f8; }
 .av-hdr-row { cursor: pointer; user-select: none; }
 .av-hdr-row:hover td { background: #e6f0fa !important; }
-.av-chev-cell { width: 28px; text-align: center; font-size: 0.75em;
-                color: #2c5282; transition: transform 0.15s; }
-.av-hdr-row.av-open .av-chev-cell { transform: rotate(90deg); }
+.av-chev-cell { width: 16px; text-align: center; font-size: 0.75em;
+                padding: 7px 2px !important; color: #2c5282; }
+.av-chev-cell .av-chev { display: inline-block; transition: transform 0.15s; }
+.av-hdr-row.av-open .av-chev-cell .av-chev { transform: rotate(90deg); }
 .av-hdr-row.av-static { cursor: default; }
 .av-hdr-row.av-static .av-chev-cell { visibility: hidden; }
-.av-detail-row td { background: #fafbfd !important;
-                    border-top: 1px dashed #d1d9e6;
-                    padding: 10px 12px 14px 36px; }
-.av-detail-row table { font-size: 12px; margin-top: 4px; }
-.av-detail-row th { background: #4a6fa5; font-size: 11px; padding: 5px 8px; }
-.av-detail-row td { padding: 5px 8px; border-bottom: 1px solid #e2e8f0; }
+.av-detail-row > td { background: #fafbfd !important;
+                      border-top: 1px dashed #d1d9e6;
+                      padding: 10px 12px 14px 20px; }
+.av-detail-row table { font-size: 12px; margin-top: 4px; width: 100%; table-layout: fixed; }
+.av-detail-row table th { background: #4a6fa5; font-size: 11px; padding: 5px 8px; }
+.av-detail-row table td { padding: 5px 8px; border-bottom: 1px solid #e2e8f0; background: transparent !important; }
 .av-detail-row h4 { font-size: 11px; font-weight: 600; color: #2c5282;
                     margin: 8px 0 3px; text-transform: uppercase; letter-spacing: 0.04em; }
 .av-detail-row h4:first-child { margin-top: 0; }
@@ -114,14 +115,14 @@ function avToggle(id) {
         $mgrTitle = Invoke-HtmlEncode $mgr.Server
 
         if ($mgr.LoginFailed) {
-            $null = $sb.Append("<details class='pool-detail' open><summary>$mgrTitle</summary>")
+            $null = $sb.Append("<details class='detail-card' open><summary>$mgrTitle</summary>")
             $null = $sb.Append("<p style='padding:10px;color:#c53030;'>")
             $null = $sb.Append("App Volumes API login failed for $(Invoke-HtmlEncode $mgr.Server) — check credentials.")
             $null = $sb.Append("</p></details>")
             continue
         }
 
-        $null = $sb.Append("<details class='pool-detail'><summary>$mgrTitle</summary>")
+        $null = $sb.Append("<details class='detail-card'><summary>$mgrTitle</summary>")
         $null = $sb.Append("<div style='padding:12px 0;'>")
 
         # ── Version ───────────────────────────────────────────────────────
@@ -170,7 +171,7 @@ function avToggle(id) {
                 $clickAttr = if ($hasDetail) { " onclick=""avToggle('$rid')"" id=""h_$rid""" } else { "" }
 
                 $null = $sb.Append("<tr class='$rowClass'$clickAttr>")
-                $null = $sb.Append("<td class='av-chev-cell'>&#9654;</td>")
+                $null = $sb.Append("<td class='av-chev-cell'><span class='av-chev'>&#9654;</span></td>")
                 $null = $sb.Append("<td>$(Invoke-HtmlEncode $prod.Name)</td>")
                 $null = $sb.Append("<td>$(Invoke-HtmlEncode $prod.Description)</td>")
                 $null = $sb.Append("<td>$statusBadge</td>")
@@ -252,7 +253,7 @@ function avToggle(id) {
                 $summary = if ($parts) { $parts -join ", " } else { "$($asnList.Count) assignment$(if($asnList.Count -ne 1){'s'})" }
 
                 $null = $sb.Append("<tr class='av-hdr-row' onclick=""avToggle('$rid')"" id='h_$rid'>")
-                $null = $sb.Append("<td class='av-chev-cell'>&#9654;</td>")
+                $null = $sb.Append("<td class='av-chev-cell'><span class='av-chev'>&#9654;</span></td>")
                 $null = $sb.Append("<td><strong>$(Invoke-HtmlEncode $grp.Name)</strong></td>")
                 $null = $sb.Append("<td>$(Invoke-HtmlEncode $summary)</td>")
                 $null = $sb.Append("</tr>")
@@ -425,7 +426,7 @@ function avToggle(id) {
                     $clickAttr  = if ($hasDetail) { " onclick=""avToggle('$rid')"" id=""h_$rid""" } else { "" }
 
                     $null = $sb.Append("<tr class='$rowClass'$clickAttr>")
-                    $null = $sb.Append("<td class='av-chev-cell'>&#9654;</td>")
+                    $null = $sb.Append("<td class='av-chev-cell'><span class='av-chev'>&#9654;</span></td>")
                     $null = $sb.Append("<td>$(Invoke-HtmlEncode $r.Name)</td>")
                     $null = $sb.Append("<td>$(Invoke-HtmlEncode $r.Description)</td>")
                     $null = $sb.Append("<td>$(Invoke-HtmlEncode $r.Type)</td>")
@@ -457,7 +458,7 @@ function avToggle(id) {
 
         # ── Storage ────────────────────────────────────────────────────────
         $hasStorage = $mgr.StorageDefaults -or @($mgr.StorageDatastores).Count -gt 0 -or
-                      @($mgr.Storages).Count -gt 0 -or @($mgr.FileShares).Count -gt 0
+                      @($mgr.Storages).Count -gt 0 -or @($mgr.StorageGroups).Count -gt 0
         if ($hasStorage) {
             $null = $sb.Append((New-AvSubHeader "Storage"))
 
@@ -505,17 +506,72 @@ function avToggle(id) {
                 $null = $sb.Append((New-HtmlTable -Headers @("Share","Status","Attachable","Used","Total","Packages","AppStacks","Writables","Added") -Rows $rows))
             }
 
-            if (@($mgr.FileShares).Count -gt 0) {
-                $null = $sb.Append("<h4 style='font-size:12px;font-weight:600;margin:10px 0 4px;color:#4a6fa5;'>File Shares</h4>")
-                $rows = foreach ($f in $mgr.FileShares) {
-                    New-HtmlTableRow -Cells @(
-                        (Invoke-HtmlEncode $f.Name),
-                        (Invoke-HtmlEncode $f.Computer),
-                        (Invoke-HtmlEncode $f.Unc),
-                        (Invoke-HtmlEncode $f.Added)
-                    )
+            if (@($mgr.StorageGroups).Count -gt 0) {
+                $null = $sb.Append("<h4 style='font-size:12px;font-weight:600;margin:10px 0 4px;color:#4a6fa5;'>Storage Groups</h4>")
+                $null = $sb.Append('<table class="av-tbl">')
+                $null = $sb.Append('<colgroup><col style="width:16px"><col style="width:22%"><col style="width:14%"><col style="width:14%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:14%"></colgroup>')
+                $null = $sb.Append('<thead><tr><th style="padding:8px 2px"></th><th>Name</th><th>Strategy</th><th>Template Storage</th><th>Members</th><th>Used</th><th>Total</th><th>Created</th></tr></thead><tbody>')
+
+                foreach ($sg in $mgr.StorageGroups) {
+                    $rid = New-AvRowId
+                    $memberCount = @($sg.Members).Count
+                    $hasDetail = $memberCount -gt 0
+
+                    $rowClass = if ($hasDetail) { "av-hdr-row" } else { "av-hdr-row av-static" }
+                    $clickAttr = if ($hasDetail) { " onclick=""avToggle('$rid')"" id=""h_$rid""" } else { "" }
+
+                    $replicateBadge = New-AvBoolBadge $sg.AutoReplicate
+                    $importBadge    = New-AvBoolBadge $sg.AutoImport
+
+                    $null = $sb.Append("<tr class='$rowClass'$clickAttr>")
+                    $null = $sb.Append("<td class='av-chev-cell'><span class='av-chev'>&#9654;</span></td>")
+                    $null = $sb.Append("<td>$(Invoke-HtmlEncode $sg.Name)</td>")
+                    $null = $sb.Append("<td>$(Invoke-HtmlEncode $sg.Strategy)</td>")
+                    $null = $sb.Append("<td>$(Invoke-HtmlEncode $sg.TemplateStorage)</td>")
+                    $null = $sb.Append("<td>$($sg.MemberCount)</td>")
+                    $null = $sb.Append("<td>$(Invoke-HtmlEncode $sg.SpaceUsed)</td>")
+                    $null = $sb.Append("<td>$(Invoke-HtmlEncode $sg.SpaceTotal)</td>")
+                    $null = $sb.Append("<td style='white-space:nowrap'>$(Invoke-HtmlEncode $sg.Created)</td>")
+                    $null = $sb.Append("</tr>")
+
+                    if ($hasDetail) {
+                        $null = $sb.Append("<tr class='av-detail-row' id='d_$rid' style='display:none'>")
+                        $null = $sb.Append("<td colspan='8'>")
+
+                        # Detail info
+                        $null = $sb.Append("<h4>Settings</h4>")
+                        $null = $sb.Append('<table style="width:100%;table-layout:fixed;">')
+                        $null = $sb.Append('<colgroup><col style="width:35%"><col style="width:65%"></colgroup>')
+                        $null = $sb.Append('<thead><tr><th>Setting</th><th>Value</th></tr></thead><tbody>')
+                        $null = $sb.Append((New-HtmlTableRow -Cells @("Auto Replicate", $replicateBadge)))
+                        $null = $sb.Append((New-HtmlTableRow -Cells @("Auto Import", $importBadge)))
+                        if ($sg.ReplicatedAt) {
+                            $null = $sb.Append((New-HtmlTableRow -Cells @("Last Replicated", (Invoke-HtmlEncode $sg.ReplicatedAt))))
+                        }
+                        if ($sg.ImportedAt) {
+                            $null = $sb.Append((New-HtmlTableRow -Cells @("Last Imported", (Invoke-HtmlEncode $sg.ImportedAt))))
+                        }
+                        $null = $sb.Append('</tbody></table>')
+
+                        # Members table
+                        $null = $sb.Append("<h4>Members ($memberCount)</h4>")
+                        $memberRows = foreach ($m in $sg.Members) {
+                            $deletedBadge = if ($m.Deleted) { New-HtmlBadge -Text "Deleted" -Color "error" } else { New-HtmlBadge -Text "Active" -Color "ok" }
+                            New-HtmlTableRow -Cells @(
+                                (Invoke-HtmlEncode $m.Name),
+                                (Invoke-HtmlEncode $m.Datacenter),
+                                (Invoke-HtmlEncode $m.SpaceUsed),
+                                (Invoke-HtmlEncode $m.SpaceTotal),
+                                $deletedBadge
+                            )
+                        }
+                        $null = $sb.Append((New-HtmlTable -Headers @("Storage","Datacenter","Used","Total","Status") -Rows $memberRows))
+
+                        $null = $sb.Append("</td></tr>")
+                    }
                 }
-                $null = $sb.Append((New-HtmlTable -Headers @("Name","Computer","UNC Path","Added") -Rows $rows))
+
+                $null = $sb.Append("</tbody></table>")
             }
 
             if ($mgr.StorageDefaults) {

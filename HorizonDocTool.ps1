@@ -131,7 +131,7 @@ function Load-Settings {
         LastVcUser        = ""; LastGuestUser = ""; LastUagUser = ""; LastAvUser = ""
         LastAvFqdn        = ""
         LastIgnoreSsl     = $false
-        LastOutputFolder  = ""; LastExportPdf = $false
+        LastOutputFolder  = ""; LastExportPdf = $false; LastOpenHtml = $true
         SaveCredentials   = $false
         LastPassword_Enc      = ""; LastVcPassword_Enc = ""; LastGuestPassword_Enc = ""
         LastUagPassword_Enc   = ""; LastAvPassword_Enc = ""
@@ -151,6 +151,7 @@ function Load-Settings {
             if ($saved.LastOutputFolder)  { $defaults.LastOutputFolder = $saved.LastOutputFolder }
             if ($null -ne $saved.LastIgnoreSsl)      { $defaults.LastIgnoreSsl      = [bool]$saved.LastIgnoreSsl }
             if ($null -ne $saved.LastExportPdf)      { $defaults.LastExportPdf      = [bool]$saved.LastExportPdf }
+            if ($null -ne $saved.LastOpenHtml)       { $defaults.LastOpenHtml       = [bool]$saved.LastOpenHtml }
             if ($null -ne $saved.SaveCredentials)    { $defaults.SaveCredentials    = [bool]$saved.SaveCredentials }
             if ($saved.LastPassword_Enc)             { $defaults.LastPassword_Enc      = $saved.LastPassword_Enc }
             if ($saved.LastVcPassword_Enc)           { $defaults.LastVcPassword_Enc    = $saved.LastVcPassword_Enc }
@@ -221,7 +222,7 @@ $controlNames = @(
     "TxtAvUser", "PwdAvPassword", "TxtAvFqdn",
     "BtnTestConnection", "BtnCancel",
     "TxtConnectionInfo", "TxtErrorLabel",
-    "TxtFolderPath", "BtnBrowseFolder", "BtnCompanyInfo", "BtnRequirements", "ChkExportPdf", "BtnGenerateReport",
+    "TxtFolderPath", "BtnBrowseFolder", "BtnCompanyInfo", "BtnRequirements", "ChkExportPdf", "ChkOpenHtml", "BtnGenerateReport",
     "ProgressBar", "TxtProgressLabel", "LogBox"
 )
 $controls = @{}
@@ -376,6 +377,7 @@ $controls["BtnTestConnection"].Add_Click({
     $currentSettings.LastGuestUser    = $guestUser
     $currentSettings.LastOutputFolder = $controls["TxtFolderPath"].Text.Trim()
     $currentSettings.LastExportPdf    = $controls["ChkExportPdf"].IsChecked -eq $true
+    $currentSettings.LastOpenHtml     = $controls["ChkOpenHtml"].IsChecked -eq $true
     $currentSettings.SaveCredentials  = $saveCredentials
     if ($saveCredentials) {
         $currentSettings.LastPassword_Enc      = Protect-SettingsPassword $passwordText
@@ -595,6 +597,7 @@ $controls["BtnGenerateReport"].Add_Click({
     $avPassword    = $controls["PwdAvPassword"].Password
     $avFqdn        = $controls["TxtAvFqdn"].Text.Trim()
     $exportPdf     = $controls["ChkExportPdf"].IsChecked -eq $true
+    $openHtml      = $controls["ChkOpenHtml"].IsChecked -eq $true
     $companyInfo   = $global:companyInfo
 
     # --- Determine run mode ---
@@ -648,6 +651,7 @@ $controls["BtnGenerateReport"].Add_Click({
     $currentSettings.LastAvFqdn       = $avFqdn
     $currentSettings.LastOutputFolder = $controls["TxtFolderPath"].Text.Trim()
     $currentSettings.LastExportPdf    = $exportPdf
+    $currentSettings.LastOpenHtml     = $openHtml
     $currentSettings.SaveCredentials  = $saveCredentials
     if ($saveCredentials) {
         $currentSettings.LastPassword_Enc      = Protect-SettingsPassword $passwordText
@@ -702,7 +706,7 @@ $controls["BtnGenerateReport"].Add_Click({
               $vcUsername, $vcPassword, $guestUsername, $guestPassword,
               $uagUsername, $uagPassword,
               $avUsername, $avPassword, $avFqdn,
-              $exportPdf, $companyInfo, $vmStartState)
+              $exportPdf, $openHtml, $companyInfo, $vmStartState)
 
         # Run mode: AV-standalone when a Manager FQDN is provided without a Horizon Server.
         # In that case the Horizon login, REST token, vCenter and all Horizon collectors are
@@ -930,14 +934,219 @@ $controls["BtnGenerateReport"].Add_Click({
         # manager list is primed from the manually entered FQDN (skipping the Horizon
         # discovery collector entirely).
         if ($avStandalone) {
-            $collectedData.AppVolumesManager = @(
-                [PSCustomObject]@{
-                    ServerName          = $avFqdn
-                    Port                = $null
-                    UserName            = $null
-                    CertificateOverride = $null
+            # Build credential for PSRemoting to AV Manager — prefer Guest creds, fall back to AV API creds
+            $avmRemoteUser = if ($guestUsername) { $guestUsername } else { $avUsername }
+            $avmRemotePwd  = if ($guestPassword) { $guestPassword } else { $avPassword }
+            $avmSecPwd     = ConvertTo-SecureString $avmRemotePwd -AsPlainText -Force
+            $avmCred       = New-Object System.Management.Automation.PSCredential($avmRemoteUser, $avmSecPwd)
+
+            # Collect AV Manager details via PSRemoting (same logic as Get-HznAppVolumesManager)
+            Write-RunspaceLog "Collecting App Volumes Manager details via PSRemoting: $avFqdn" "INFO"
+            $avmData = [PSCustomObject]@{
+                ServerName        = $avFqdn
+                Port              = $null
+                UserName          = $null
+                CertificateOverride = $null
+                AppVolumesVersion = ""
+                ServiceStatus     = ""
+                OsVersion         = ""
+                NginxCertFile     = ""
+                NginxKeyFile      = ""
+                CertValid         = $null
+                CertValidFrom     = "N/A"
+                CertValidTo       = "N/A"
+                GuestFreeMemMB    = $null
+                GuestTotalMemMB   = $null
+                LocalAdmins       = @()
+                DiskFreeGB        = $null
+                DiskTotalGB       = $null
+                LastPatchId       = ""
+                LastPatchDate     = ""
+                OdbcDsnEntries    = @()
+                NetIPAddress      = ""
+                NetSubnet         = ""
+                NetGateway        = ""
+                NetDNS1           = ""
+                NetDNS2           = ""
+            }
+            $avmRemoteSkipped = @()
+
+            # PSRemoting block
+            try {
+                $remoteInfo = Invoke-Command -ComputerName $avFqdn -Credential $avmCred -ErrorAction Stop -ScriptBlock {
+                    $result = @{}
+                    # App Volumes Version
+                    $avReg = Get-ItemProperty -Path "HKLM:\SOFTWARE\CloudVolumes\Manager" -ErrorAction SilentlyContinue
+                    if (-not $avReg) { $avReg = Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\CloudVolumes\Manager" -ErrorAction SilentlyContinue }
+                    $result.Version = if ($avReg -and $avReg.Version) { $avReg.Version } else {
+                        $uninstall = Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
+                                     Where-Object { $_.DisplayName -match 'App Volumes Manager|CloudVolumes Manager' } | Select-Object -First 1
+                        if ($uninstall) { $uninstall.DisplayVersion } else { "" }
+                    }
+                    # Service status
+                    $svc = Get-Service -Name "CVManager" -ErrorAction SilentlyContinue
+                    if (-not $svc) { $svc = Get-Service -Name "svmanager" -ErrorAction SilentlyContinue }
+                    $result.ServiceStatus = if ($svc) { $svc.Status.ToString() } else { "Not Found" }
+                    # OS Version
+                    $os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction SilentlyContinue
+                    $result.OsVersion = if ($os) { "$($os.Caption) ($($os.Version))" } else { "" }
+                    # nginx.conf certificate paths
+                    $nginxConf = "C:\Program Files (x86)\CloudVolumes\Manager\nginx\conf\nginx.conf"
+                    $result.NginxCertFile = ""; $result.NginxKeyFile = ""
+                    if (Test-Path $nginxConf) {
+                        $lines = Get-Content $nginxConf -ErrorAction SilentlyContinue
+                        foreach ($line in $lines) {
+                            if ($line -match '^\s*ssl_certificate\s+([^;]+);')     { $result.NginxCertFile = $Matches[1].Trim() }
+                            if ($line -match '^\s*ssl_certificate_key\s+([^;]+);') { $result.NginxKeyFile  = $Matches[1].Trim() }
+                        }
+                    }
+                    # Certificate validity
+                    $result.CertValidFrom = $null; $result.CertValidTo = $null; $result.CertValid = $null
+                    if ($result.NginxCertFile) {
+                        $certPath = $result.NginxCertFile
+                        if (-not [System.IO.Path]::IsPathRooted($certPath)) {
+                            $certPath = Join-Path "C:\Program Files (x86)\CloudVolumes\Manager\nginx\conf" $certPath
+                        }
+                        if (Test-Path $certPath) {
+                            try {
+                                $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath)
+                                $result.CertValidFrom = $cert.NotBefore.ToString("yyyy-MM-dd")
+                                $result.CertValidTo   = $cert.NotAfter.ToString("yyyy-MM-dd")
+                                $result.CertValid     = ($cert.NotBefore -le (Get-Date)) -and ($cert.NotAfter -ge (Get-Date))
+                                $cert.Dispose()
+                            } catch {}
+                        }
+                    }
+                    # Network configuration
+                    $adapter = Get-NetIPConfiguration | Where-Object { $_.IPv4DefaultGateway } | Select-Object -First 1
+                    if ($adapter) {
+                        $ifIndex = $adapter.InterfaceIndex
+                        $ipAddr  = ($adapter.IPv4Address | Select-Object -First 1).IPAddress
+                        $gateway = ($adapter.IPv4DefaultGateway | Select-Object -First 1).NextHop
+                        $prefix  = (Get-NetIPAddress -InterfaceIndex $ifIndex -AddressFamily IPv4 | Select-Object -First 1).PrefixLength
+                        $maskBin = ('1' * $prefix).PadRight(32, '0')
+                        $mask    = (0..3 | ForEach-Object { [convert]::ToInt32($maskBin.Substring($_ * 8, 8), 2) }) -join '.'
+                        $result.NetIP      = $ipAddr
+                        $result.NetSubnet  = $mask
+                        $result.NetGateway = $gateway
+                        $dns = (Get-DnsClientServerAddress -InterfaceIndex $ifIndex -AddressFamily IPv4).ServerAddresses
+                        $result.NetDNS1 = if ($dns.Count -ge 1) { $dns[0] } else { "" }
+                        $result.NetDNS2 = if ($dns.Count -ge 2) { $dns[1] } else { "" }
+                    }
+                    # Local Administrators
+                    $result.LocalAdmins = @()
+                    try {
+                        $members = net localgroup Administrators 2>$null
+                        $collecting = $false; $admins = @()
+                        foreach ($line in $members) {
+                            if ($line -match '^---') { $collecting = $true; continue }
+                            if ($collecting -and $line -match '\S' -and $line -notmatch 'Der Befehl|The command') { $admins += $line.Trim() }
+                        }
+                        $result.LocalAdmins = $admins
+                    } catch {}
+                    # ODBC System DSN entries
+                    $result.OdbcDsn = @()
+                    try {
+                        $dsnKeys = Get-ItemProperty "HKLM:\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources" -ErrorAction SilentlyContinue
+                        if ($dsnKeys) {
+                            $entries = @()
+                            foreach ($prop in $dsnKeys.PSObject.Properties) {
+                                if ($prop.Name -notmatch '^PS') {
+                                    $dsnName   = $prop.Name
+                                    $dsnDriver = $prop.Value
+                                    $platform  = "64-bit"
+                                    $wow = Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\ODBC\ODBC.INI\ODBC Data Sources" -ErrorAction SilentlyContinue
+                                    if ($wow -and $wow.$dsnName) { $platform = "32-bit" }
+                                    $dsnDetail = Get-ItemProperty "HKLM:\SOFTWARE\ODBC\ODBC.INI\$dsnName" -ErrorAction SilentlyContinue
+                                    $dsnServer = if ($dsnDetail -and $dsnDetail.Server) { $dsnDetail.Server } else { "" }
+                                    $dsnDB     = if ($dsnDetail -and $dsnDetail.Database) { $dsnDetail.Database } else { "" }
+                                    $entries += [PSCustomObject]@{ Name = $dsnName; Platform = $platform; Driver = $dsnDriver; Server = $dsnServer; Database = $dsnDB }
+                                }
+                            }
+                            $result.OdbcDsn = $entries
+                        }
+                    } catch {}
+                    # Guest Memory
+                    try {
+                        $osMem = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction SilentlyContinue
+                        if ($osMem) {
+                            $result.GuestFreeMemMB  = [math]::Round($osMem.FreePhysicalMemory / 1KB, 0)
+                            $result.GuestTotalMemMB = [math]::Round($osMem.TotalVisibleMemorySize / 1KB, 0)
+                        }
+                    } catch {}
+                    return $result
                 }
-            )
+                if ($remoteInfo) {
+                    $avmData.AppVolumesVersion = $remoteInfo.Version
+                    $avmData.ServiceStatus     = $remoteInfo.ServiceStatus
+                    $avmData.OsVersion         = $remoteInfo.OsVersion
+                    $avmData.NginxCertFile     = $remoteInfo.NginxCertFile
+                    $avmData.NginxKeyFile      = $remoteInfo.NginxKeyFile
+                    $avmData.CertValidFrom     = if ($remoteInfo.CertValidFrom) { $remoteInfo.CertValidFrom } else { "N/A" }
+                    $avmData.CertValidTo       = if ($remoteInfo.CertValidTo)   { $remoteInfo.CertValidTo }   else { "N/A" }
+                    $avmData.CertValid         = $remoteInfo.CertValid
+                    $avmData.NetIPAddress      = $remoteInfo.NetIP
+                    $avmData.NetSubnet         = $remoteInfo.NetSubnet
+                    $avmData.NetGateway        = $remoteInfo.NetGateway
+                    $avmData.NetDNS1           = $remoteInfo.NetDNS1
+                    $avmData.NetDNS2           = $remoteInfo.NetDNS2
+                    $avmData.LocalAdmins       = @($remoteInfo.LocalAdmins) | Where-Object { $_ }
+                    $avmData.OdbcDsnEntries    = @($remoteInfo.OdbcDsn)
+                    $avmData.GuestFreeMemMB    = $remoteInfo.GuestFreeMemMB
+                    $avmData.GuestTotalMemMB   = $remoteInfo.GuestTotalMemMB
+                    Write-RunspaceLog "AVM $avFqdn PSRemoting details collected successfully" "INFO"
+                }
+            } catch {
+                Write-RunspaceLog "AVM $avFqdn remote query failed (PSRemoting): $($_.Exception.Message)" "WARN"
+                $avmRemoteSkipped += "PSRemoting"
+            }
+
+            # Disk space (C:) via CIM
+            $diskCim = $null
+            try {
+                $cimSessW = New-CimSession -ComputerName $avFqdn -Credential $avmCred -ErrorAction Stop -OperationTimeoutSec 15
+                $diskCim  = Get-CimInstance -CimSession $cimSessW -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
+                Remove-CimSession $cimSessW -ErrorAction SilentlyContinue
+            } catch {
+                try {
+                    $cimOptD  = New-CimSessionOption -Protocol Dcom
+                    $cimSessD = New-CimSession -ComputerName $avFqdn -SessionOption $cimOptD -Credential $avmCred -ErrorAction Stop -OperationTimeoutSec 15
+                    $diskCim  = Get-CimInstance -CimSession $cimSessD -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
+                    Remove-CimSession $cimSessD -ErrorAction SilentlyContinue
+                } catch { $avmRemoteSkipped += "disk space" }
+            }
+            if ($diskCim) {
+                $avmData.DiskFreeGB  = [math]::Round($diskCim.FreeSpace / 1GB, 1)
+                $avmData.DiskTotalGB = [math]::Round($diskCim.Size      / 1GB, 1)
+            }
+
+            # Last Windows patch via CIM
+            $patchList = $null
+            try {
+                $cimSessW = New-CimSession -ComputerName $avFqdn -Credential $avmCred -ErrorAction Stop -OperationTimeoutSec 20
+                $patchList = Get-CimInstance -CimSession $cimSessW -ClassName Win32_QuickFixEngineering -ErrorAction Stop
+                Remove-CimSession $cimSessW -ErrorAction SilentlyContinue
+            } catch {
+                try {
+                    $cimOptD  = New-CimSessionOption -Protocol Dcom
+                    $cimSessD = New-CimSession -ComputerName $avFqdn -SessionOption $cimOptD -Credential $avmCred -ErrorAction Stop -OperationTimeoutSec 20
+                    $patchList = Get-CimInstance -CimSession $cimSessD -ClassName Win32_QuickFixEngineering -ErrorAction Stop
+                    Remove-CimSession $cimSessD -ErrorAction SilentlyContinue
+                } catch { $avmRemoteSkipped += "patches" }
+            }
+            if ($avmRemoteSkipped.Count -gt 0) {
+                Write-RunspaceLog "AVM $avFqdn remote query skipped: $($avmRemoteSkipped -join ', ')" "WARN"
+            }
+            if ($patchList) {
+                $topPatch = $patchList | Where-Object { $_.InstalledOn } | Sort-Object InstalledOn -Descending | Select-Object -First 1
+                if (-not $topPatch) { $topPatch = $patchList | Sort-Object HotFixID -Descending | Select-Object -First 1 }
+                if ($topPatch) {
+                    $avmData.LastPatchId   = $topPatch.HotFixID
+                    $avmData.LastPatchDate = if ($topPatch.InstalledOn) { $topPatch.InstalledOn.ToString("yyyy-MM-dd") } else { "" }
+                }
+            }
+
+            $collectedData.AppVolumesManager = @($avmData)
             $steps = @(
                 @{ Name = "App Volumes API Data";   Key = "AppVolumesData";
                    Collector = [scriptblock]{ Get-HznAppVolumesData -AvUsername $avUsername -AvPassword $avPassword } }
@@ -1220,6 +1429,22 @@ $controls["BtnGenerateReport"].Add_Click({
                 $pdfWritten = Export-HorizonPdf -HtmlPath $reportPath -PdfPath $pdfPath -ScriptRoot $moduleBasePath
             }
 
+            # Open HTML report in Edge (optional — triggered by checkbox)
+            if ($reportWritten -and $openHtml) {
+                try {
+                    Start-Process "msedge.exe" -ArgumentList "`"$reportPath`""
+                    Write-RunspaceLog "Opened HTML report in Edge" "OK"
+                } catch {
+                    # Fallback: open with default browser
+                    try {
+                        Start-Process $reportPath
+                        Write-RunspaceLog "Opened HTML report in default browser" "OK"
+                    } catch {
+                        Write-RunspaceLog "Could not open HTML report: $($_.Exception.Message)" "WARN"
+                    }
+                }
+            }
+
             $window.Dispatcher.Invoke([Action]{
                 $controls["ProgressBar"].Value     = 100
                 if ($reportWritten) {
@@ -1242,7 +1467,7 @@ $controls["BtnGenerateReport"].Add_Click({
             })
         }
 
-    }).AddArgument($outputFolder).AddArgument($scriptRoot).AddArgument($window).AddArgument($controls).AddArgument($cancelToken).AddArgument($serverInput).AddArgument($finalUser).AddArgument($passwordText).AddArgument($finalDomain).AddArgument($ignoreSsl).AddArgument($vcUser).AddArgument($vcPassword).AddArgument($guestUser).AddArgument($guestPassword).AddArgument($uagUser).AddArgument($uagPassword).AddArgument($avUser).AddArgument($avPassword).AddArgument($avFqdn).AddArgument($exportPdf).AddArgument($companyInfo).AddArgument($global:vmStartState)
+    }).AddArgument($outputFolder).AddArgument($scriptRoot).AddArgument($window).AddArgument($controls).AddArgument($cancelToken).AddArgument($serverInput).AddArgument($finalUser).AddArgument($passwordText).AddArgument($finalDomain).AddArgument($ignoreSsl).AddArgument($vcUser).AddArgument($vcPassword).AddArgument($guestUser).AddArgument($guestPassword).AddArgument($uagUser).AddArgument($uagPassword).AddArgument($avUser).AddArgument($avPassword).AddArgument($avFqdn).AddArgument($exportPdf).AddArgument($openHtml).AddArgument($companyInfo).AddArgument($global:vmStartState)
 
     $global:generateJob = $ps.BeginInvoke()
 })
@@ -1274,6 +1499,7 @@ $window.Add_Loaded({
     if ($settings.LastOutputFolder) { $controls["TxtFolderPath"].Text = $settings.LastOutputFolder }
     $controls["ChkIgnoreSsl"].IsChecked        = $settings.LastIgnoreSsl
     $controls["ChkExportPdf"].IsChecked        = $settings.LastExportPdf
+    $controls["ChkOpenHtml"].IsChecked         = $settings.LastOpenHtml
     $controls["ChkSaveCredentials"].IsChecked  = $settings.SaveCredentials
     # Restore encrypted passwords if Save Credentials was active
     if ($settings.SaveCredentials) {

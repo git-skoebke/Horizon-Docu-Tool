@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # Render-RdsFarms — New-HtmlRdsFarmsSection
 # Dot-sourced inside the Runspace scriptblock
 # =============================================================================
@@ -11,39 +11,25 @@ function New-HtmlRdsFarmsSection {
 
     $content = [System.Text.StringBuilder]::new()
 
-    # Overview table
-    $ovRows = foreach ($f in ($Farms | Sort-Object Name)) {
-        $statusBadge = if ($f.Enabled -eq "True") { New-HtmlBadge -Text "Enabled" -Color "ok" } else { New-HtmlBadge -Text "Disabled" -Color "neutral" }
-        $typeBadge   = New-HtmlBadge -Text "$($f.Type)" -Color "neutral"
-        $srcBadge    = New-HtmlBadge -Text "$($f.Source)" -Color "neutral"
-        New-HtmlTableRow -Cells @(
-            (Invoke-HtmlEncode $f.Name),
-            (Invoke-HtmlEncode $f.DisplayName),
-            $typeBadge, $srcBadge, $statusBadge,
-            (Invoke-HtmlEncode $f.MaxServers),
-            (Invoke-HtmlEncode $f.MinReadyVMs),
-            (Invoke-HtmlEncode $f.GoldenImage),
-            (Invoke-HtmlEncode $f.Snapshot)
-        )
-    }
-    $null = $content.Append((New-HtmlTable -Headers @("Name","Display Name","Type","Source","Status","Max Servers","Min Ready","Golden Image","Snapshot") -Rows $ovRows))
-
-    # Per-farm detail cards for AUTOMATED farms
     foreach ($f in ($Farms | Sort-Object Name)) {
-        if ($f.Type -ne "AUTOMATED") { continue }
-
         $statusBadge = if ($f.Enabled -eq "True") { New-HtmlBadge -Text "Enabled" -Color "ok" } else { New-HtmlBadge -Text "Disabled" -Color "neutral" }
         $typeBadge   = New-HtmlBadge -Text "$($f.Type)" -Color "neutral"
         $srcBadge    = New-HtmlBadge -Text "$($f.Source)" -Color "neutral"
 
-        $null = $content.Append("<details class='pool-detail' style='margin-top:16px;border:1px solid #d1d9e6;border-radius:4px;'>")
-        $null = $content.Append("<summary style='padding:10px 14px;font-weight:600;cursor:pointer;background:#f7f9fc;border-radius:4px;'>")
-        $null = $content.Append("$(Invoke-HtmlEncode $f.Name) $typeBadge $srcBadge")
+        $displayInfo = if ($f.DisplayName -and $f.DisplayName -ne $f.Name) {
+            " <span class='card-meta'>($(Invoke-HtmlEncode $f.DisplayName))</span>"
+        } else { "" }
+
+        $null = $content.Append("<details class='detail-card'>")
+        $null = $content.Append("<summary>")
+        $null = $content.Append((Invoke-HtmlEncode $f.Name))
+        $null = $content.Append($displayInfo)
+        $null = $content.Append(" <span class='card-meta'>$typeBadge &nbsp;$srcBadge &nbsp;$statusBadge</span>")
         $null = $content.Append("</summary>")
-        $null = $content.Append("<div style='padding:14px 18px;'>")
+        $null = $content.Append("<div>")
 
         # General
-        $null = $content.Append("<h4 style='margin:0 0 8px;font-size:13px;color:#2c5282;'>General</h4>")
+        $null = $content.Append("<h4>General</h4>")
         $genRows = @(
             (New-HtmlTableRow -Cells @("Status",            $statusBadge)),
             (New-HtmlTableRow -Cells @("Naming Pattern",    (Invoke-HtmlEncode $f.NamingPattern))),
@@ -65,7 +51,7 @@ function New-HtmlRdsFarmsSection {
 
         # Session Settings
         if ($f.DiscTimeoutPolicy -or $f.EmptyTimeoutPolicy -or $f.PreLaunchPolicy) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Session Settings</h4>")
+            $null = $content.Append("<h4>Session Settings</h4>")
             $sessRows = @()
             if ($f.DiscTimeoutPolicy) {
                 $discVal = Invoke-HtmlEncode $f.DiscTimeoutPolicy
@@ -88,7 +74,7 @@ function New-HtmlRdsFarmsSection {
 
         # Provisioning
         if ($f.GoldenImage) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Provisioning</h4>")
+            $null = $content.Append("<h4>Provisioning</h4>")
             $provRows = @(
                 (New-HtmlTableRow -Cells @("Golden Image",  (Invoke-HtmlEncode $f.GoldenImage))),
                 (New-HtmlTableRow -Cells @("GI Path",       (Invoke-HtmlEncode $f.GoldenImagePath))),
@@ -105,7 +91,7 @@ function New-HtmlRdsFarmsSection {
 
         # IC Image State / Scheduled Maintenance
         if ($f.IcImageState -or $f.SchedMaintNext) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Image Status</h4>")
+            $null = $content.Append("<h4>Image Status</h4>")
             $imgRows = @()
             if ($f.IcImageState) {
                 $stateColor = if ($f.IcImageState -eq "READY") { "ok" } else { "warn" }
@@ -121,7 +107,7 @@ function New-HtmlRdsFarmsSection {
 
         # Customization
         if ($f.AdContainer -or $f.CustomizationType) {
-            $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Customization</h4>")
+            $null = $content.Append("<h4>Customization</h4>")
             $custRows = @()
             if ($f.CustomizationType) { $custRows += New-HtmlTableRow -Cells @("Type",              (Invoke-HtmlEncode $f.CustomizationType)) }
             if ($f.AdContainer)       { $custRows += New-HtmlTableRow -Cells @("AD Container",      (Invoke-HtmlEncode $f.AdContainer)) }
@@ -130,19 +116,21 @@ function New-HtmlRdsFarmsSection {
         }
 
         # Instant Clone Chain
-        $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Instant Clone Chain</h4>")
-        if ($f.CpTemplate -or $f.CpReplica) {
-            $tplDisplay = if ($f.CpTemplate) { $f.CpTemplate } else { "-" }
-            $repDisplay = if ($f.CpReplica)  { $f.CpReplica  } else { "-" }
-            $icRows = @(
-                (New-HtmlTableRow -Cells @("cp-template", (Invoke-HtmlEncode $tplDisplay))),
-                (New-HtmlTableRow -Cells @("cp-replica",  (Invoke-HtmlEncode $repDisplay)))
-            )
-            $null = $content.Append((New-HtmlTable -Headers @("Role","VM Name") -Rows $icRows))
-        } elseif (-not $viConnected) {
-            $null = $content.Append("<p style='color:#888;font-style:italic;'>vCenter not connected. Provide vCenter credentials to see cp-template/replica details.</p>")
-        } else {
-            $null = $content.Append("<p style='color:#888;font-style:italic;'>No machines provisioned yet.</p>")
+        if ($f.Source -eq "INSTANT_CLONE") {
+            $null = $content.Append("<h4>Instant Clone Chain</h4>")
+            if ($f.CpTemplate -or $f.CpReplica) {
+                $tplDisplay = if ($f.CpTemplate) { $f.CpTemplate } else { "-" }
+                $repDisplay = if ($f.CpReplica)  { $f.CpReplica  } else { "-" }
+                $icRows = @(
+                    (New-HtmlTableRow -Cells @("cp-template", (Invoke-HtmlEncode $tplDisplay))),
+                    (New-HtmlTableRow -Cells @("cp-replica",  (Invoke-HtmlEncode $repDisplay)))
+                )
+                $null = $content.Append((New-HtmlTable -Headers @("Role","VM Name") -Rows $icRows))
+            } elseif (-not $viConnected) {
+                $null = $content.Append("<p style='color:#888;font-style:italic;'>vCenter not connected. Provide vCenter credentials to see cp-template/replica details.</p>")
+            } else {
+                $null = $content.Append("<p style='color:#888;font-style:italic;'>No machines provisioned yet.</p>")
+            }
         }
 
         $null = $content.Append("</div></details>")
@@ -150,4 +138,3 @@ function New-HtmlRdsFarmsSection {
 
     return New-HtmlSection -Id "rds-farms" -Title "RDS Farms" -Content $content.ToString()
 }
-

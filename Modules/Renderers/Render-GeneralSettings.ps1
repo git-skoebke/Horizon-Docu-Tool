@@ -17,7 +17,7 @@ function New-HtmlGeneralSettingsSection {
     }
 
     # --- General Settings ---
-    $null = $content.Append("<h4 style='margin:0 0 8px;font-size:13px;color:#2c5282;'>Session &amp; Timeout</h4>")
+    $null = $content.Append("<h4>Session &amp; Timeout</h4>")
     $genRows = @(
         (& $row "Client Max Session Timeout Policy"     $Settings.ClientMaxSessionTimeoutPolicy),
         (& $row "Client Max Session Timeout (min)"      $Settings.ClientMaxSessionTimeoutMinutes),
@@ -30,7 +30,7 @@ function New-HtmlGeneralSettingsSection {
     ) | Where-Object { $_ }
     if ($genRows) { $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $genRows)) }
 
-    $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Forced Logoff &amp; Disconnect</h4>")
+    $null = $content.Append("<h4>Forced Logoff &amp; Disconnect</h4>")
     $logoffRows = @(
         (& $row "Forced Logoff Timeout (min)"           $Settings.ForcedLogoffTimeoutMinutes),
         (& $row "Forced Logoff Message"                 $Settings.ForcedLogoffMessage),
@@ -41,7 +41,7 @@ function New-HtmlGeneralSettingsSection {
     ) | Where-Object { $_ }
     if ($logoffRows) { $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $logoffRows)) }
 
-    $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Client &amp; Display</h4>")
+    $null = $content.Append("<h4>Client &amp; Display</h4>")
     $clientRows = @(
         (& $row "Hide Domain List in Client"            $Settings.HideDomainListInClient),
         (& $row "Hide Server Info in Client"            $Settings.HideServerInformationInClient),
@@ -56,7 +56,7 @@ function New-HtmlGeneralSettingsSection {
     ) | Where-Object { $_ }
     if ($clientRows) { $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $clientRows)) }
 
-    $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Authentication &amp; Login</h4>")
+    $null = $content.Append("<h4>Authentication &amp; Login</h4>")
     $authRows = @(
         (& $row "Multi-Factor Re-Authentication"        $Settings.EnableMultiFactorReAuth),
         (& $row "Enable Server in Single User Mode"     $Settings.EnableServerInSingleUserMode),
@@ -71,7 +71,7 @@ function New-HtmlGeneralSettingsSection {
 
     # --- Restricted Client Data ---
     if ($Settings.RestrictedClientData -and @($Settings.RestrictedClientData).Count -gt 0) {
-        $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Restricted Client Versions</h4>")
+        $null = $content.Append("<h4>Restricted Client Versions</h4>")
         $rcRows = foreach ($rc in @($Settings.RestrictedClientData)) {
             $warnVers = if ($rc.warn_specific_versions) { ($rc.warn_specific_versions -join ", ") } else { "-" }
             New-HtmlTableRow -Cells @(
@@ -84,7 +84,7 @@ function New-HtmlGeneralSettingsSection {
     }
 
     # --- Security Settings ---
-    $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Security</h4>")
+    $null = $content.Append("<h4>Security</h4>")
     $secRows = @(
         (& $row "Message Security Mode"                 $Settings.MessageSecurityMode),
         (& $row "Message Security Status"               $Settings.MessageSecurityStatus),
@@ -100,7 +100,7 @@ function New-HtmlGeneralSettingsSection {
     if ($secRows) { $null = $content.Append((New-HtmlTable -Headers @("Setting","Value") -Rows $secRows)) }
 
     # --- Feature Settings ---
-    $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Features</h4>")
+    $null = $content.Append("<h4>Features</h4>")
     $featRows = @(
         (& $row "Helpdesk Enabled"                      $Settings.EnableHelpdesk),
         (& $row "Image Management Enabled"              $Settings.EnableImageManagement),
@@ -115,7 +115,7 @@ function New-HtmlGeneralSettingsSection {
 
     # --- Client Policies ---
     if ($Settings.ClientPolicies -and @($Settings.ClientPolicies).Count -gt 0) {
-        $null = $content.Append("<h4 style='margin:14px 0 8px;font-size:13px;color:#2c5282;'>Client Policies</h4>")
+        $null = $content.Append("<h4>Client Policies</h4>")
         $cpRows = foreach ($cp in @($Settings.ClientPolicies)) {
             New-HtmlTableRow -Cells @(
                 (Invoke-HtmlEncode "$($cp.policy)"),
