@@ -2,6 +2,9 @@
 
 A PowerShell-based WPF application that generates comprehensive HTML documentation of Omnissa Horizon VDI environments. Connect to a Horizon Connection Server, collect environment data via REST API and PowerCLI, and produce a self-contained HTML report — no additional frameworks required.
 
+![ScreenShot](https://github.com/git-skoebke/Horizon-Docu-Tool/blob/ea56f22602bc0f60f048383c58998d973b0a1ee7/Tools/DocuTool_Horizon_Tab.png)
+
+
 ![PowerShell 7](https://img.shields.io/badge/PowerShell-7.x-blue)
 ![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/License-Private-red)
