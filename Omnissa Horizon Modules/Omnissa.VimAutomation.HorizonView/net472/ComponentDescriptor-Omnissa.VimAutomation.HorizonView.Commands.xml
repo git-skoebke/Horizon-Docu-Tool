@@ -1,0 +1,25 @@
+<ComponentDescriptor>
+  <Name>Omnissa.VimAutomation.HorizonView.Commands</Name>
+  <Assembly>Omnissa.VimAutomation.HorizonView.Commands</Assembly>
+  <ImplementingType>Omnissa.VimAutomation.HorizonView.Commands.HorizonViewCmdletsImpl</ImplementingType>
+  <IsSnapin>true</IsSnapin>
+  <ProvidedServiceList>
+  </ProvidedServiceList>
+  <RequiredServiceList>
+    <ServiceDescriptor>
+      <Name>HViewService</Name>
+      <Version>1.0</Version>
+    </ServiceDescriptor>
+  </RequiredServiceList>
+  <ExtendedServiceList></ExtendedServiceList>
+  <Version>
+    <Major>8</Major>
+    <Minor>0</Minor>
+    <Revision>0</Revision>
+    <Build>000000</Build>
+    <Company>Omnissa Inc.</Company>
+    <Copyright>Copyright 2020</Copyright>
+    <UserFriendlyVersion>Omnissa HorizonView PowerCLI Component 8.0.0 build 000000</UserFriendlyVersion>
+    <Description>Provides Connect/Disconnect cmdlets for View API service.</Description>
+  </Version>
+</ComponentDescriptor>

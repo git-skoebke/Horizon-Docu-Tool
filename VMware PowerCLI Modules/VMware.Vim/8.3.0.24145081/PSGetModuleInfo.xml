@@ -1,0 +1,144 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>Microsoft.PowerShell.Commands.PSRepositoryItemInfo</T>
+      <T>System.Management.Automation.PSCustomObject</T>
+      <T>System.Object</T>
+    </TN>
+    <MS>
+      <S N="Name">VMware.Vim</S>
+      <Version N="Version">8.3.0.24145081</Version>
+      <S N="Type">Module</S>
+      <S N="Description">This PowerShell module contains PowerCLI Vim.</S>
+      <S N="Author">Broadcom</S>
+      <S N="CompanyName">VMware</S>
+      <S N="Copyright">Copyright (c) Broadcom. All Rights Reserved.</S>
+      <DT N="PublishedDate">2024-07-25T12:46:48+02:00</DT>
+      <Obj N="InstalledDate" RefId="1">
+        <DT>2026-02-13T10:06:45.0249241+01:00</DT>
+        <MS>
+          <Obj N="DisplayHint" RefId="2">
+            <TN RefId="1">
+              <T>Microsoft.PowerShell.Commands.DisplayHintType</T>
+              <T>System.Enum</T>
+              <T>System.ValueType</T>
+              <T>System.Object</T>
+            </TN>
+            <ToString>DateTime</ToString>
+            <I32>2</I32>
+          </Obj>
+        </MS>
+      </Obj>
+      <Nil N="UpdatedDate" />
+      <Nil N="LicenseUri" />
+      <URI N="ProjectUri">https://developer.vmware.com/powercli</URI>
+      <URI N="IconUri">https://raw.githubusercontent.com/vmware/PowerCLI-Example-Scripts/1710f7ccbdd9fe9a3ab3f000e920fa6e8e042c63/resources/powercli-psgallery-icon.svg</URI>
+      <Obj N="Tags" RefId="3">
+        <TN RefId="2">
+          <T>System.Object[]</T>
+          <T>System.Array</T>
+          <T>System.Object</T>
+        </TN>
+        <LST>
+          <S>PSModule</S>
+        </LST>
+      </Obj>
+      <Obj N="Includes" RefId="4">
+        <TN RefId="3">
+          <T>System.Collections.Hashtable</T>
+          <T>System.Object</T>
+        </TN>
+        <DCT>
+          <En>
+            <S N="Key">Workflow</S>
+            <Obj N="Value" RefId="5">
+              <TNRef RefId="2" />
+              <LST />
+            </Obj>
+          </En>
+          <En>
+            <S N="Key">Command</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">DscResource</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">RoleCapability</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">Function</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+          <En>
+            <S N="Key">Cmdlet</S>
+            <Ref N="Value" RefId="5" />
+          </En>
+        </DCT>
+      </Obj>
+      <Nil N="PowerShellGetFormatVersion" />
+      <Nil N="ReleaseNotes" />
+      <Obj N="Dependencies" RefId="6">
+        <TNRef RefId="2" />
+        <LST>
+          <Obj RefId="7">
+            <TN RefId="4">
+              <T>System.Collections.Specialized.OrderedDictionary</T>
+              <T>System.Object</T>
+            </TN>
+            <DCT>
+              <En>
+                <S N="Key">Name</S>
+                <S N="Value">VMware.VimAutomation.Common</S>
+              </En>
+              <En>
+                <S N="Key">MinimumVersion</S>
+                <S N="Value">13.3.0.24145081</S>
+              </En>
+              <En>
+                <S N="Key">CanonicalId</S>
+                <S N="Value">nuget:VMware.VimAutomation.Common/13.3.0.24145081</S>
+              </En>
+            </DCT>
+          </Obj>
+        </LST>
+      </Obj>
+      <S N="RepositorySourceLocation">https://www.powershellgallery.com/api/v2</S>
+      <S N="Repository">PSGallery</S>
+      <S N="PackageManagementProvider">NuGet</S>
+      <Obj N="AdditionalMetadata" RefId="8">
+        <TN RefId="5">
+          <T>System.Management.Automation.PSCustomObject</T>
+          <T>System.Object</T>
+        </TN>
+        <MS>
+          <S N="copyright">Copyright (c) Broadcom. All Rights Reserved.</S>
+          <S N="description">This PowerShell module contains PowerCLI Vim.</S>
+          <S N="requireLicenseAcceptance">False</S>
+          <S N="isLatestVersion">False</S>
+          <S N="isAbsoluteLatestVersion">False</S>
+          <S N="versionDownloadCount">6941105</S>
+          <S N="downloadCount">26909530</S>
+          <S N="packageSize">19765074</S>
+          <S N="published">25.07.2024 12:46:48 +02:00</S>
+          <S N="created">25.07.2024 12:46:48 +02:00</S>
+          <S N="lastUpdated">13.02.2026 09:00:00 +01:00</S>
+          <S N="tags">PSModule</S>
+          <S N="developmentDependency">False</S>
+          <S N="updated">2026-02-13T09:00:00Z</S>
+          <S N="NormalizedVersion">8.3.0.24145081</S>
+          <S N="Authors">Broadcom</S>
+          <S N="IsPrerelease">false</S>
+          <S N="ItemType">Module</S>
+          <S N="FileList">VMware.Vim.nuspec|EULA.rtf|VMware.Vim.psm1|net472\ImageFactoryService.dll|net472\InternalVimService70.Wcf.dll|net472\VimService.dll|net472\VMware.Vim.psd1|netcoreapp3.1\ImageFactoryService.dll|netcoreapp3.1\InternalVimService70.Wcf.dll|netcoreapp3.1\VimService.dll|netcoreapp3.1\VMware.Vim.dll|netcoreapp3.1\VMware.Vim.psd1|VMware.Vim.cat|VMware.Vim.psd1|net472\DeployAutomationService.dll|net472\InternalVimService50.Wcf.dll|net472\InventoryService55.Wcf.dll|net472\VMware.Vim.dll|netcoreapp3.1\DeployAutomationService.dll|netcoreapp3.1\InternalVimService50.Wcf.dll|netcoreapp3.1\InventoryService55.Wcf.dll</S>
+          <S N="GUID">a8eeec2b-0bd9-4a5f-9d61-8a03b6fad3c3</S>
+          <S N="PowerShellVersion">5.1</S>
+          <S N="CompanyName">Broadcom, Inc.</S>
+        </MS>
+      </Obj>
+      <S N="InstalledLocation">C:\Users\skoebkeadmin\Documents\PowerShell\Modules\VMware.Vim\8.3.0.24145081</S>
+    </MS>
+  </Obj>
+</Objs>
