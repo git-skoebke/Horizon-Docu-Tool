@@ -108,7 +108,7 @@ function New-HtmlApplicationPoolsSection {
                         "<span style='color:#718096'>&#8212;</span>")
                 }
             }
-            $null = $content.Append((New-HtmlTable -Headers @("Name","Type","Members") -Rows $entRows))
+            $null = $content.Append((New-HtmlTable -Headers @("Name","Type","Members") -Rows $entRows -Cols @('75%','12%','13%')))
         } else {
             $null = $content.Append("<p><em style='color:#888'>No entitlements configured</em></p>")
         }

@@ -39,7 +39,7 @@ function Get-HtmlColWidths {
             'Property|Value'          = @('35%','65%')
             'Setting|Value'           = @('35%','65%')
             'Policy|Value'            = @('40%','60%')
-            'Feature|Enabled'         = @('75%','25%')
+            'Feature|Enabled'         = @('60%','40%')
             'Policy|Enforcement State'= @('55%','45%')
             'Privilege|'              = @('100%')
             'Name|Description'        = @('35%','65%')
@@ -78,8 +78,8 @@ function Get-HtmlColWidths {
         'Predefined'      = 90
         'Contactable'     = 90
         'CBRC'            = 65
-        'Members'         = 70
-        'Member Count'    = 100
+        'Members'         = 120
+        'Member Count'    = 130
         'NetBIOS'         = 80
         'Version'         = 75
         'Build'           = 90

@@ -152,7 +152,7 @@ function avToggle(id) {
         if ($mgr.AppProducts -and $mgr.AppProducts.Count -gt 0) {
             $null = $sb.Append((New-AvSubHeader "Applications"))
             $null = $sb.Append('<table class="av-tbl">')
-            $null = $sb.Append('<colgroup><col style="width:28px"><col style="width:24%"><col><col style="width:90px"><col style="width:135px"></colgroup>')
+            $null = $sb.Append('<colgroup><col style="width:28px"><col style="width:24%"><col><col style="width:90px"><col style="width:160px"></colgroup>')
             $null = $sb.Append('<thead><tr><th></th><th>Name</th><th>Description</th><th>Status</th><th>Last Updated</th></tr></thead><tbody>')
 
             foreach ($prod in $mgr.AppProducts) {
@@ -367,7 +367,7 @@ function avToggle(id) {
                         (Invoke-HtmlEncode $capTxt)
                     )
                 }
-                $null = $sb.Append((New-HtmlTable -Headers @("License Type","In Use","Cap") -Rows $rows))
+                $null = $sb.Append((New-HtmlTable -Headers @("License Type","In Use","Cap") -Rows $rows -Cols @('75%','12%','13%')))
             }
         }
 
