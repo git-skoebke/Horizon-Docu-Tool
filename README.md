@@ -21,10 +21,6 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
       <img src="docs/screenshots/connection-servers.png" alt="Connection Servers" width="100%">
       <br><sub><b>Connection Servers</b> — Detail cards with version, status badges and certificate info</sub>
     </td>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/connection-server-details.png" alt="Connection Server System Detail" width="100%">
-      <br><sub><b>Connection Server Detail</b> — Memory, disk space, patches, local admins and ODBC config</sub>
-    </td>
   </tr>
   <tr>
     <td align="center" width="50%">
@@ -61,7 +57,10 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
       <img src="docs/screenshots/esxi-hosts.png" alt="ESXi Hosts" width="100%">
       <br><sub><b>ESXi Hosts</b> — Hardware specs, vCPU:pCPU ratios and vGPU driver info</sub>
     </td>
-    <td></td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/connection-server-details.png" alt="Connection Server System Detail" width="100%">
+      <br><sub><b>Connection Server Detail</b> — Memory, disk space, patches, local admins and ODBC config</sub>
+    </td>
   </tr>
 </table>
 
