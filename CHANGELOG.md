@@ -12,10 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2026-04-14]
 
 ### Changed
+- Simplify README gallery: replace individual screenshots with single full report overview
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 - Improve README: add Key Features table with unique reporting capabilities
 - Update screenshots: redacted sensitive data, add App Volumes Manager detail, rename connection-server-detail
 
 ### Added
+- Add full report overview screenshot with link in README gallery
 - Add MIT License
 - Add report screenshot gallery with 8 annotated screenshots
 - CHANGELOG.md with automatic Git hook update on each commit

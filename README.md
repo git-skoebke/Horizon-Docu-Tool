@@ -12,10 +12,7 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
 ## Report Gallery
 
 <p align="center">
-  <a href="docs/screenshots/full-report-overview.jpeg">
-    <img src="docs/screenshots/full-report-overview.jpeg" alt="Full Report Overview" width="100%">
-  </a>
-  <br><sub><b>Full Report Overview</b> — all sections at a glance</sub>
+  <a href="docs/screenshots/full-report-overview.jpeg">Full Report</a>
 </p>
 
 ---
