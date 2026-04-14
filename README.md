@@ -19,7 +19,7 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
       <br><sub><b>Connection Servers</b> — Detail cards with version, status badges and certificate info</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/connection-server-detail.png" alt="Connection Server System Detail" width="100%">
+      <img src="docs/screenshots/connection-server-details.png" alt="Connection Server System Detail" width="100%">
       <br><sub><b>Connection Server Detail</b> — Memory, disk space, patches, local admins and ODBC config</sub>
     </td>
   </tr>
@@ -29,29 +29,36 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
       <br><sub><b>App Volumes Configuration</b> — Applications, packages and user assignments</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/vcenter-datastores.png" alt="vCenter Servers and Datastores" width="100%">
-      <br><sub><b>vCenter Servers & Datastores</b> — Capacity, usage and powered-on VM counts</sub>
+      <img src="docs/screenshots/app-volumes-manager-detail.png" alt="App Volumes Manager Detail" width="100%">
+      <br><sub><b>App Volumes Manager</b> — Manager server details, storage and license info</sub>
     </td>
   </tr>
   <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/vcenter-datastores.png" alt="vCenter Servers and Datastores" width="100%">
+      <br><sub><b>vCenter Servers & Datastores</b> — Capacity, usage and powered-on VM counts</sub>
+    </td>
     <td align="center" width="50%">
       <img src="docs/screenshots/rds-farms-general.png" alt="RDS Farms" width="100%">
       <br><sub><b>RDS Farms</b> — Farm configuration, session settings and provisioning status</sub>
     </td>
+  </tr>
+  <tr>
     <td align="center" width="50%">
       <img src="docs/screenshots/rds-farms-provisioning.png" alt="RDS Farms Provisioning" width="100%">
       <br><sub><b>RDS Farms — Provisioning</b> — Golden Image path, IC chain state and customisation settings</sub>
     </td>
-  </tr>
-  <tr>
     <td align="center" width="50%">
       <img src="docs/screenshots/internal-template-vms.png" alt="Internal Template VMs" width="100%">
       <br><sub><b>Internal Template VMs</b> — cp-template / cp-replica inventory with pool assignments</sub>
     </td>
+  </tr>
+  <tr>
     <td align="center" width="50%">
       <img src="docs/screenshots/esxi-hosts.png" alt="ESXi Hosts" width="100%">
       <br><sub><b>ESXi Hosts</b> — Hardware specs, vCPU:pCPU ratios and vGPU driver info</sub>
     </td>
+    <td></td>
   </tr>
 </table>
 
