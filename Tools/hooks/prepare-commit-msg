@@ -1,0 +1,37 @@
+#!/bin/sh
+# =============================================================================
+# prepare-commit-msg — auto-updates CHANGELOG.md before each commit.
+# Install via: Tools/Install-GitHooks.ps1
+# =============================================================================
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"   # merge | squash | message | template | (empty)
+
+# Skip merge/squash/amend operations
+if [ "$COMMIT_SOURCE" = "merge" ] || [ "$COMMIT_SOURCE" = "squash" ]; then
+    exit 0
+fi
+
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+REPO_ROOT=$(git rev-parse --show-toplevel)
+SCRIPT="$REPO_ROOT/Tools/Update-Changelog.ps1"
+
+if [ ! -f "$SCRIPT" ]; then
+    exit 0
+fi
+
+# Run PowerShell script (pwsh = PowerShell 7, fallback to powershell = 5)
+if command -v pwsh >/dev/null 2>&1; then
+    PS_CMD="pwsh"
+else
+    PS_CMD="powershell"
+fi
+
+"$PS_CMD" -NoProfile -NonInteractive -ExecutionPolicy Bypass \
+    -File "$SCRIPT" -CommitMessage "$COMMIT_MSG"
+
+if [ $? -eq 0 ]; then
+    git add "$REPO_ROOT/CHANGELOG.md" 2>/dev/null
+fi
+
+exit 0
