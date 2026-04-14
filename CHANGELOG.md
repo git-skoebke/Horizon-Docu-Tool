@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [2026-04-14]
 
+### Changed
+- Update screenshots: redacted sensitive data, add App Volumes Manager detail, rename connection-server-detail
+
 ### Added
 - Add report screenshot gallery with 8 annotated screenshots
 - CHANGELOG.md with automatic Git hook update on each commit

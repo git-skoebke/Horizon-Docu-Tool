@@ -6,7 +6,7 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
 
 ![PowerShell 7](https://img.shields.io/badge/PowerShell-7.x-blue)
 ![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey)
-![License](https://img.shields.io/badge/License-Private-red)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
