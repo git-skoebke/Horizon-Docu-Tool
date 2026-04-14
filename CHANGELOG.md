@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CHANGELOG.md with automatic Git hook update on each commit
 
 ### Fixed
+- Fix Update-Changelog.ps1 regex scoping and correct misplaced changelog entry
 - Column widths in HTML report tables no longer overflow or truncate content
   - `Members` column: 70 px → 120 px (fits collapsible group toggle)
   - `Member Count` column: 100 px → 130 px (fits header + member toggles)
