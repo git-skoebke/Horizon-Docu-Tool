@@ -15,6 +15,10 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
 <table>
   <tr>
     <td align="center" width="50%">
+      <img src="docs/screenshots/DocuTool_Horizon_Tab.png" alt="Main Window Connection Broker Tab" width="100%">
+      <br><sub><b>Connection Servers</b> — Detail cards with version, status badges and certificate info</sub>
+    </td>
+    <td align="center" width="50%">
       <img src="docs/screenshots/connection-servers.png" alt="Connection Servers" width="100%">
       <br><sub><b>Connection Servers</b> — Detail cards with version, status badges and certificate info</sub>
     </td>
