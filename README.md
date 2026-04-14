@@ -66,34 +66,53 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
 
 ---
 
-## Features
+## Key Features
+
+### Unique Reporting Capabilities
+
+> These are data points that are difficult or impossible to obtain from the Horizon Admin Console alone.
+
+| Feature | Why it matters |
+|---|---|
+| **vCenter Role & full Permission listing** | Documents every privilege granted to the Horizon service account — essential for audits and least-privilege reviews |
+| **ESXi vGPU — driver version & vGPU type** | Confirms GPU driver consistency across all hosts; catches version drift before it causes session failures |
+| **vCPU:pCPU ratio per ESXi host & cluster** | Instant overcommit visibility — critical for performance capacity planning in VDI environments |
+| **App Volumes database & certificate details** | Surfaces SQL connection strings, DB health, and TLS certificate expiry in one place |
+| **Connection Server `locked.properties`** | Reads the file via PSRemoting and shows every hidden tuning parameter that is otherwise not visible in the Admin Console |
+| **Desktop Pool overview incl. vGPU profile & Internal Templates** | One table showing pool type, vGPU profile, golden image, snapshot, and IC template chain — no more clicking through individual pools |
+| **Full Internal Template VM listing** | Shows every cp-template and cp-replica with its pool association — spot orphaned or misconfigured templates immediately |
+| **All Entitlements with member count** | Lists every entitled user/group with resolved member counts — directly usable for **Named User licence audits** |
+
+### General Features
 
 - **WPF GUI** — Modern dark-themed interface with credential management, connection testing, and progress tracking
 - **Self-contained HTML reports** — Single-file output with embedded CSS, no external dependencies
 - **PDF export** — Optional PDF generation via bundled wkhtmltopdf
 - **Credential persistence** — DPAPI-encrypted credential storage (per-user, per-machine)
 - **Portable PowerShell 7** — Bundled PS7 runtime, no system-wide installation needed
-- **Modular architecture** — 30+ collectors and renderers, each in its own file
+- **Modular architecture** — 30+ collectors and renderers, each in its own .ps1 file
+- **App Volumes standalone mode** — Run without a Horizon Connection Server to document App Volumes infrastructure independently
 
 ## Documented Components
 
 | Category | Data Collected |
 |----------|---------------|
-| **Connection Servers** | Server details, version, status, certificates |
-| **Desktop Pools** | Pool configuration, provisioning settings, entitlements |
-| **Application Pools** | Published apps, farm assignments |
-| **RDS Farms** | Farm topology, host status |
+| **Connection Servers** | Version, status, certificates, replication partners, `locked.properties` |
+| **Desktop Pools** | Configuration, vGPU profile, provisioning settings, entitlements, internal templates |
+| **Application Pools** | Published apps, farm assignments, entitlements with member counts |
+| **RDS Farms** | Farm topology, session settings, provisioning, IC chain |
 | **Golden Images** | Base image inventory, snapshot chains |
-| **ESXi Hosts** | Host hardware, cluster membership |
-| **vCenter** | vCenter configuration, connection status |
+| **Internal Template VMs** | cp-template / cp-replica inventory with pool assignments |
+| **ESXi Hosts** | Hardware specs, vCPU:pCPU ratio, vGPU type & driver version |
+| **vCenter** | Configuration, roles, full permission listing per service account |
 | **UAG (Unified Access Gateway)** | Edge services, SSL certificates, health status |
-| **App Volumes** | Application assignments, packages, writeable volumes |
-| **App Volumes Manager** | Manager server details, service status, certificates, ODBC config |
-| **General Settings** | Global policies, environment properties, license info |
-| **Security** | SAML authenticators, TrueSSO config, AD domains, permissions |
+| **App Volumes** | Applications, packages, assignments, writable volumes |
+| **App Volumes Manager** | Server details, database config, certificates, ODBC, license & usage |
+| **Entitlements** | All desktop & application entitlements with resolved member counts |
+| **General Settings** | Global policies, environment properties, licence info |
+| **Security** | SAML authenticators, TrueSSO config, AD domains, administrator permissions |
 | **Infrastructure** | Datastores, gateways, gateway certificates, syslog config, event DB |
 | **Cloud Pod Architecture** | CPA federation topology |
-| **Entitlements** | Global and local entitlements (desktop + application) |
 
 ## Requirements
 
