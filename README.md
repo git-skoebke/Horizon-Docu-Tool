@@ -64,6 +64,12 @@ A PowerShell-based WPF application that generates comprehensive HTML documentati
   </tr>
 </table>
 
+<p align="center">
+  <a href="docs/screenshots/full-report-overview.jpeg">
+    📄 View full report screenshot (all sections)
+  </a>
+</p>
+
 ---
 
 ## Key Features

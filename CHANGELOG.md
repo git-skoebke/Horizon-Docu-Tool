@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2026-04-14]
 
 ### Changed
+- Improve README: add Key Features table with unique reporting capabilities
 - Update screenshots: redacted sensitive data, add App Volumes Manager detail, rename connection-server-detail
 
 ### Added
