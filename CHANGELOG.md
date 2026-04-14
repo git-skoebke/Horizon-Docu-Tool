@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [2026-04-14]
 
+### Added
+- CHANGELOG.md with automatic Git hook update on each commit
+
 ### Fixed
 - Column widths in HTML report tables no longer overflow or truncate content
   - `Members` column: 70 px → 120 px (fits collapsible group toggle)
