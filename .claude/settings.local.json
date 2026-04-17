@@ -1,7 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Skill(gsd-progress)",
+      "Bash(pwsh -NoProfile -ExecutionPolicy Bypass -File \"Tools/Install-GitHooks.ps1\")",
+      "Bash(du -sh \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\"/*)",
+      "Bash(cp \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\\\\2026-04-13 15_54-Greenshot.png\" \"C:\\\\Claude_Projects\\\\Horizon Docu Tool\\\\docs\\\\screenshots\\\\connection-servers.png\")",
+      "Bash(cp \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\\\\2026-04-13 15_55-.png\"          \"C:\\\\Claude_Projects\\\\Horizon Docu Tool\\\\docs\\\\screenshots\\\\connection-server-detail.png\")",
+      "Bash(cp \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\\\\2026-04-13 15_56-.png\"          \"C:\\\\Claude_Projects\\\\Horizon Docu Tool\\\\docs\\\\screenshots\\\\app-volumes-config.png\")",
+      "Bash(cp \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\\\\RDS Farmen 01.png\"              \"C:\\\\Claude_Projects\\\\Horizon Docu Tool\\\\docs\\\\screenshots\\\\rds-farms-general.png\")",
+      "Bash(cp \"C:\\\\Users\\\\skoebkeadmin\\\\Pictures\\\\Docu Tool Github Screenshots\\\\RDS Farmen 02.png\"              \"C:\\\\Claude_Projects\\\\Horizon Docu Tool\\\\docs\\\\screenshots\\\\rds-farms-provisioning.png\")"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "gsd-workflow"
+  ]
 }

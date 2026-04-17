@@ -367,7 +367,7 @@ function avToggle(id) {
                         (Invoke-HtmlEncode $capTxt)
                     )
                 }
-                $null = $sb.Append((New-HtmlTable -Headers @("License Type","In Use","Cap") -Rows $rows -Cols @('75%','12%','13%')))
+                $null = $sb.Append((New-HtmlTable -Headers @("License Type","In Use","Cap") -Rows $rows))
             }
         }
 

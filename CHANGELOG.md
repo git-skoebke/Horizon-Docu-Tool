@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2026-04-14]
 
 ### Changed
+- Replace full report image with text link in README gallery
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 - Simplify README gallery: replace individual screenshots with single full report overview
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
