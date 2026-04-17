@@ -7,6 +7,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+
+---
+
+## [2026-04-17]
+
+### Changed
+- Simplify table column widths and move screenshots to docs/
+
+- Replace complex fixed/special-case Get-HtmlColWidths logic with simple
+  equal-percent widths (100/n% per column)
+- Remove explicit -Cols overrides in Render-AppVolumesData and
+  Render-ApplicationPools that are now redundant
+- Move tool screenshots from Tools/ to docs/screenshots/
+- Update Claude permissions in settings.local.json
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+---
 ---
 
 ## [2026-04-14]
